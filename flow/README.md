@@ -1,9 +1,17 @@
 # FLOW — A calendar without the calendar
 
-FLOW is an experimental, mobile-first visual calendar with a daily Flow, event Orbit and non-grid Space Map. Features: local event creation, editing, deletion, search, notes, locations, category colors, free time suggestions, JSON backup/import and iCalendar export. The app is an installable offline-first PWA.
+FLOW is an experimental, mobile-first, installable calendar interface. Instead of seven-column grids it uses a winding daily Flow, a central event Orbit, and an organic Space Map of floating commitments and open time windows.
 
-The GitHub Pages deployment includes two gzip + base64 source bundles (app.js.b64 and styles.css.b64) which the loader in index.html decompresses in modern browsers. Readable JavaScript, CSS, HTML and other project files are in the complete FLOW source ZIP delivered with the app. This special packing is for deployment only.
+Features: event creation, editing, deletion, search, notes and locations, free-time suggestions, local storage, JSON backup and import, .ics export, example events, and offline home-screen installation on iPhone.
 
-**Google Calendar is optional and not yet connected by default.** To connect, enable the Google Calendar API at https://console.cloud.google.com/apis/library/calendar-json.googleapis.com, configure an OAuth consent screen and add yourself as a tester if necessary, create a Web Application OAuth Client ID, and authorize JavaScript origin https://lukakljun.github.io . Enter the public Client ID in FLOW Settings, then tap Connect Google. Never paste a client secret into the app. Google events are fetched for the signed-in browser session.
+This folder contains the readable original HTML, JavaScript, and CSS source. No dependencies or build tooling. Open via a local HTTP server or GitHub Pages. Pages URL when publishing main from / (root): https://lukakljun.github.io/luka.github.io/flow/ .
 
-GitHub Pages path (if published from main /(root)): https://lukakljun.github.io/luka.github.io/flow/ . On iPhone use Safari → Share → Add to Home Screen. Local event data is stored on your device/browser, not in this GitHub repository.
+## Google Calendar
+
+Google Calendar integration uses user-initiated OAuth directly in the browser; it is not connected by default. To connect:
+1. Enable Google Calendar API in https://console.cloud.google.com/apis/library/calendar-json.googleapis.com .
+2. Configure an OAuth consent screen. Add yourself as a test user while in Testing.
+3. Create a Web Application OAuth Client ID and authorize JavaScript origin https://lukakljun.github.io (no URL path).
+4. Enter the public client ID (never a secret) in FLOW Settings and select Connect Google.
+
+App data stays on your device unless you explicitly connect and modify Google events. Safari → Share → Add to Home Screen installs the web app.
