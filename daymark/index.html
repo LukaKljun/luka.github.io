@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#4b2c23">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Daymark">
+  <meta name="description" content="A different kind of calendar: turn your schedule into a daily rhythm.">
+
+
+
+<style>
+:root {
+  --leather:#4b2c23; --leather-2:#6d4836; --leather-dark:#2f1d19; --gold:#bf914f;
+  --paper:#f8f3e9; --paper-2:#eee6d8; --ink:#2d2927; --muted:#817b73;
+  --line:#dfd5c5; --red:#b95145; --sage:#718a77; --blue:#658293;
+  --shadow:0 12px 25px rgba(60,38,23,.12),0 2px 6px rgba(60,38,23,.08);
+}
+*{box-sizing:border-box}
+html{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;background:#e7e1d5;color:var(--ink)}
+body{margin:0;min-height:100%;background:radial-gradient(ellipse at 20% 15%,#f3f0e9,#d8d1c4 80%)}
+button,input,textarea,select{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #ca994c;outline-offset:3px}
+.app-frame{max-width:480px;margin:auto;min-height:100dvh;background:var(--paper);position:relative;overflow:hidden;box-shadow:0 0 70px rgba(31,24,17,.21)}
+@media(min-width:580px){.app-frame{margin:26px auto;min-height:min(850px,calc(100dvh - 52px));height:min(850px,calc(100dvh - 52px));border:8px solid #37312e;border-radius:38px;overflow:auto;scrollbar-width:none}.app-frame::-webkit-scrollbar{display:none}}
+/* walnut-colored, stitched, 2011-inspired header */
+.leather{position:relative;color:#f7eee0;background:repeating-linear-gradient(94deg,transparent 0,rgba(255,255,255,.016) 2px,transparent 4px,rgba(0,0,0,.025) 7px),linear-gradient(135deg,var(--leather-2),var(--leather) 45%,var(--leather-dark));box-shadow:inset 0 1px rgba(255,255,255,.22),inset 0 -5px 9px rgba(12,9,7,.12),0 5px 13px rgba(51,31,19,.16);padding:calc(env(safe-area-inset-top,0px) + 18px) 21px 20px}
+.leather:after{content:"";pointer-events:none;position:absolute;inset:6px 6px 6px;border:1px dashed rgba(248,208,144,.34);border-radius:10px}
+.leather-top{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{display:flex;align-items:center;gap:11px}.brand-mark{width:37px;height:37px;border:1px solid #dfc28a;border-radius:12px;display:grid;place-items:center;background:radial-gradient(circle at 30% 22%,#eac98d,#a97c39 70%);box-shadow:inset 0 1px 2px #fff5,0 2px 4px #0006;color:#493323;font-family:Georgia,serif;font-size:26px;text-shadow:0 1px #fffc}
+.brand-name{font-family:Georgia,"Times New Roman",serif;letter-spacing:.11em;font-size:17px;font-weight:bold}.brand-kicker{font-size:9px;letter-spacing:.2em;color:#e4ca9c;margin-top:4px}
+.circle-tool{border:1px solid rgba(238,211,166,.55);color:#f7e7ce;width:37px;height:37px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(#805c45,#4a3027);box-shadow:inset 0 1px 1px #ffffff35,0 2px 4px #0004}
+.circle-tool svg{width:18px;height:18px}
+.hero-date{position:relative;z-index:1;margin:27px 3px 12px;display:flex;justify-content:space-between;align-items:end;gap:10px}
+.eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:700}.hero-date .eyebrow{color:#dfc292}
+.hero-date h1{margin:8px 0 0;font-family:Georgia,"Times New Roman",serif;font-weight:normal;font-size:37px;letter-spacing:-.035em;line-height:1.1;color:#fff9f0}
+.live-time{text-align:right;padding-bottom:3px}.live-time strong{font-size:15px;letter-spacing:.06em;font-weight:600}.live-time small{display:block;color:#d8b78e;font-size:10px;margin-top:4px;letter-spacing:.04em}
+.leather-divider{height:5px;background:linear-gradient(#b08b60,#d6bc89 40%,#786042);box-shadow:0 2px 3px #57432b3d}
+.paper{background:radial-gradient(circle at 14% 9%,rgba(255,255,255,.8),transparent 47%),repeating-linear-gradient(0deg,rgba(102,78,45,.014),rgba(102,78,45,.014) 1px,transparent 1px,transparent 4px),var(--paper)}
+.main-content{min-height:calc(100dvh - 150px);padding-bottom:calc(105px + env(safe-area-inset-bottom,0px))}
+.week-rail{display:flex;align-items:center;gap:4px;margin:17px 15px 18px;padding:5px;background:linear-gradient(#f6f1e6,#e6dece);border:1px solid #d4c7b4;border-radius:13px;box-shadow:inset 0 2px 5px #765c3216,0 1px #fffe}
+.week-arrow{flex:0 0 24px;width:24px;height:40px;border:0;background:none;color:#917f69;display:grid;place-items:center}.week-arrow svg{width:16px;height:16px}
+.week-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));flex:1;gap:2px;min-width:0}.day-chip{height:58px;min-width:0;border:1px solid transparent;border-radius:9px;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#7a736a;gap:5px;position:relative}
+.day-chip .weekday{font-size:9px;letter-spacing:.07em;font-weight:700}.day-chip .day-number{font-family:Georgia,serif;font-size:19px;line-height:1}.day-chip.is-selected{background:linear-gradient(#78503a,#452a22);color:#fff2db;border:1px solid #3a211c;box-shadow:inset 0 1px 0 #fffa,0 2px 4px #0003}.day-chip.today:not(.is-selected) .day-number{color:var(--red);font-weight:bold}.day-chip.has-events:after{content:"";position:absolute;bottom:3px;width:3px;height:3px;border-radius:50%;background:var(--gold)}.day-chip.is-selected.has-events:after{background:#f6dba2}
+.page-padding{padding:0 20px}.section-label{display:flex;justify-content:space-between;align-items:center;margin:22px 0 14px}.section-label h2{margin:0;font-family:Georgia,serif;font-size:23px;font-weight:normal;letter-spacing:-.035em}.section-label .eyebrow{color:#b38c56;font-size:9px}.subtle-text{font-size:11px;color:var(--muted)}
+.focus-preview{position:relative;border-radius:17px;background:linear-gradient(135deg,#fffaf1 0%,#f1e6d6 100%);border:1px solid #d7c4a8;box-shadow:var(--shadow),inset 0 1px #fff;padding:16px 17px 17px;overflow:hidden}
+.focus-preview:before{content:"";position:absolute;top:0;bottom:0;left:0;width:5px;background:linear-gradient(var(--red),#d59a7e)}
+.focus-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.focus-tag{font-size:10px;letter-spacing:.16em;color:#a16d52;font-weight:800}.pill{display:inline-flex;align-items:center;border-radius:40px;border:1px solid #d3b991;background:linear-gradient(#fffcf7,#ede0ca);box-shadow:inset 0 1px #fff;padding:5px 10px;font-size:10px;font-weight:700;color:#8f673c;letter-spacing:.03em;white-space:nowrap}
+.focus-preview h2{font-family:Georgia,serif;font-size:26px;line-height:1.18;font-weight:normal;margin:15px 0 8px;letter-spacing:-.035em;overflow-wrap:anywhere}.focus-desc{color:#7e7469;font-size:12px;line-height:1.5;margin-bottom:16px}.focus-actions{display:flex;align-items:center;justify-content:space-between;gap:8px}.metal-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:linear-gradient(#fbfaf6,#d9d0c2);border:1px solid #b9aa96;border-bottom-color:#9f9182;border-radius:10px;box-shadow:inset 0 2px 1px #fff,0 2px 3px #7260432c;color:#574637;font-weight:750;font-size:12px;padding:10px 14px;min-height:39px}.metal-button.primary{background:linear-gradient(#debe81,#ac7c40);border-color:#93683b;color:#33261a;text-shadow:0 1px #fff5}.metal-button svg{width:15px;height:15px}.quiet-action{background:transparent;border:0;color:#937c61;font-size:12px;text-decoration:underline;text-underline-offset:3px;padding:9px 2px}
+.rhythm-bar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:26px}.rhythm-bar .section-label{margin:0}.progress-chip{font-size:11px;display:flex;align-items:center;gap:7px;color:#887664}.progress-ring{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(var(--sage) var(--progress,0%),#e2d8c8 0)}.progress-ring:after{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--paper)}
+.segmented{display:flex;gap:3px;margin:15px 0 15px;padding:4px;background:#e8dfd0;border-radius:10px;border:1px solid #d6cab7;box-shadow:inset 0 2px 3px #6b503312}.segmented button{flex:1;background:transparent;border:1px solid transparent;padding:8px 4px;border-radius:8px;color:#897c6d;font-size:11px;font-weight:800;letter-spacing:.025em}.segmented button.active{background:linear-gradient(#fffefb,#f2ebdf);border-color:#d6c8b5;color:#624d3b;box-shadow:0 1px 3px #49361f22}
+.period-heading{display:flex;align-items:center;gap:8px;margin:20px 0 10px;color:#988570}.period-heading span{font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}.period-heading:after{content:"";height:1px;background:linear-gradient(#dcd0c0,#e7ded1);flex:1}.period-heading svg{height:14px;width:14px;color:#a78c64}
+.event-list{position:relative}.event-item{display:flex;gap:9px;position:relative;margin-bottom:11px}.event-time{flex:0 0 49px;font-size:11px;color:#8e8171;text-align:right;padding-top:15px;font-weight:750;letter-spacing:-.025em}.event-time small{display:block;margin-top:4px;font-size:9px;font-weight:400}.timeline{width:10px;display:flex;flex-direction:column;align-items:center;padding-top:16px}.timeline-dot{height:10px;width:10px;border:3px solid var(--paper);box-shadow:0 0 0 2px var(--dot-color,#b48f65);border-radius:50%;background:var(--dot-color,#b48f65);z-index:1}.timeline-stem{width:1px;flex:1;background:#d9c9b7;margin-top:4px}.event-card{position:relative;min-width:0;flex:1;text-align:left;display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#fffcf6,#f6eee2);border:1px solid #ded2c0;box-shadow:0 2px 5px #55402810,inset 0 1px 0 #fff;border-radius:12px;padding:14px 11px 14px 13px;color:var(--ink)}.event-card:active{transform:translateY(1px)}.event-card.done{opacity:.59}.event-card.done .event-title{text-decoration:line-through;text-decoration-color:#8e867b}.event-card-main{flex:1;min-width:0}.event-title{font-family:Georgia,serif;font-size:16px;font-weight:normal;overflow-wrap:anywhere;line-height:1.2}.event-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;color:#8b8278;font-size:10px;margin-top:7px}.tiny-dot{width:5px;height:5px;background:var(--dot-color,#ad8b61);border-radius:50%;display:inline-block}.event-note{font-size:11px;margin-top:8px;color:#8b7b6b;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.check-circle{flex:0 0 28px;height:28px;border-radius:50%;border:1px solid #cbbfac;color:#a39077;background:linear-gradient(#fffcf8,#ede5da);display:grid;place-items:center;box-shadow:inset 0 1px #fff}.check-circle svg{width:14px;height:14px}.check-circle.checked{color:#fff;background:linear-gradient(#90a994,#5d8065);border-color:#57725e}
+.empty-state{border:1px dashed #d6c6b2;background:#f5eee1a8;border-radius:14px;text-align:center;padding:35px 20px;color:#847362}.empty-state .empty-symbol{font-family:Georgia,serif;color:#b28d56;font-size:41px}.empty-state h3{font-family:Georgia,serif;color:#5c4d3d;font-size:20px;font-weight:normal;margin:7px 0}.empty-state p{font-size:12px;line-height:1.6;margin:0 0 14px}
+.end-mark{text-align:center;margin:25px 0 13px;font-family:Georgia,serif;font-size:14px;color:#b9a181;letter-spacing:.1em}
+.bottom-dock{position:sticky;bottom:0;z-index:20;display:flex;justify-content:space-around;align-items:center;gap:5px;min-height:calc(72px + env(safe-area-inset-bottom,0px));padding:9px 18px calc(8px + env(safe-area-inset-bottom,0px));margin-top:calc(-72px - env(safe-area-inset-bottom,0px));background:linear-gradient(#fefdfb 0,#ded8cf 8%,#b4afa8 52%,#d9d2c9 100%);border-top:1px solid #b7aba0;box-shadow:0 -4px 15px #5d4d3a21,inset 0 2px 0 #fff9}.dock-tab{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:57px;min-height:47px;padding:6px 7px;background:transparent;border:1px solid transparent;color:#665e58;text-shadow:0 1px #fff9;border-radius:10px}.dock-tab svg{width:20px;height:20px}.dock-tab span{font-size:9px;font-weight:800;letter-spacing:.04em}.dock-tab.active{background:linear-gradient(#8b8178,#5c514b);border-color:#5e544d;box-shadow:inset 0 1px 4px #241b1666,0 1px 0 #fff9;color:#fff;text-shadow:0 -1px #0006}.dock-add{display:grid;place-items:center;width:55px;height:55px;border-radius:17px;background:linear-gradient(140deg,#e8c78c,#bd8b4d 67%,#936a3e);color:#422e20;border:1px solid #987345;box-shadow:inset 0 2px 2px #fff9,0 3px 7px #33221955;margin-top:-21px;transform:rotate(-3deg)}.dock-add svg{height:26px;width:26px;transform:rotate(3deg)}
+/* Alternate views */
+.view-intro{margin-top:18px;margin-bottom:20px}.view-intro .eyebrow{color:#ac8655}.view-intro h2{margin:6px 0 7px;font-family:Georgia,serif;font-size:34px;font-weight:normal;letter-spacing:-.04em}.view-intro p{margin:0;color:#8b8175;font-size:12px;line-height:1.6}
+.week-card{width:100%;display:flex;align-items:center;gap:13px;border:1px solid #dbcebb;border-radius:13px;padding:15px 14px;margin:10px 0;color:var(--ink);background:linear-gradient(120deg,#fffcf7,#f0e7d8);text-align:left;box-shadow:0 2px 5px #5540280d}.week-card.selected{border-color:#b38954;box-shadow:0 0 0 2px #d9bd8733,0 3px 8px #3b2a1b17}.week-date-badge{width:52px;min-height:58px;background:linear-gradient(#efe5d4,#dfd0b7);border:1px solid #d6c5ac;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#65513c}.week-date-badge strong{font:normal 28px Georgia,serif}.week-date-badge small{font-weight:800;font-size:9px;letter-spacing:.1em}.week-content{flex:1;min-width:0}.week-content strong{font-family:Georgia,serif;font-weight:normal;font-size:17px}.week-content p{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#857a6e;margin:6px 0 0}.mini-bars{display:flex;gap:3px;margin-top:8px}.mini-bars i{width:21px;height:3px;border-radius:2px;background:#b48a50}.mini-bars i.done{background:#74917c}.week-chevron{color:#9c8b79}.week-chevron svg{width:19px;height:19px}.week-progress{text-align:center;font-size:12px;color:#907d65;margin:17px 0}
+.search-box{display:flex;align-items:center;gap:9px;background:linear-gradient(#eee6d9,#f9f4ec);border:1px solid #d3c5b3;border-radius:11px;padding:0 11px;margin:18px 0 12px;box-shadow:inset 0 2px 5px #63503b18}.search-box svg{height:18px;width:18px;color:#967f65}.search-box input{flex:1;min-width:0;background:none;border:0;padding:14px 0;outline:none;font-size:14px;color:#4b3b2b}.result-date{font-family:Georgia,serif;color:#a17e52;font-size:14px;padding:12px 0 4px;margin-top:8px}.search-result{width:100%;border:1px solid #dfd1bc;border-radius:10px;background:#fffcf7;padding:13px;margin-top:8px;display:flex;gap:11px;align-items:center;text-align:left;color:var(--ink)}.search-result .result-time{font-size:10px;min-width:54px;color:#92785e}.search-result strong{font-family:Georgia,serif;font-weight:normal;font-size:16px;flex:1}.search-result .pill{font-size:9px;padding:4px 7px}
+/* overlays */
+.overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-end;justify-content:center;background:rgba(30,22,19,.59);backdrop-filter:blur(3px);animation:fade-in .15s ease}
+@media(min-width:580px){.overlay{position:absolute}}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+.sheet{width:100%;max-height:min(91dvh,780px);overflow:auto;background:repeating-linear-gradient(0deg,transparent,transparent 32px,#dacdbb29 33px),var(--paper);border-radius:21px 21px 0 0;border:1px solid #e2d4c0;box-shadow:0 -15px 50px #0004;animation:slide-in .24s ease;padding-bottom:calc(25px + env(safe-area-inset-bottom,0px))}
+@keyframes slide-in{from{transform:translateY(25px);opacity:.6}to{transform:translateY(0);opacity:1}}
+.sheet-header{background:linear-gradient(#72503c,#3c2822);padding:18px 20px;color:#f7e9d2;display:flex;align-items:center;justify-content:space-between;box-shadow:inset 0 2px #ffffff26;border-bottom:4px solid #be935b}.sheet-header h2{font:normal 24px Georgia,serif;margin:2px 0 0}.sheet-header .eyebrow{color:#d7b686;font-size:9px}.close-sheet{width:32px;height:32px;border:1px solid #b08a6f;border-radius:50%;background:#50372a;color:white;display:grid;place-items:center}.close-sheet svg{height:17px;width:17px}.sheet-body{padding:18px 21px 9px}.field{display:block;margin:0 0 16px}.field span{display:block;color:#907753;font-size:10px;letter-spacing:.13em;font-weight:800;text-transform:uppercase;margin:0 0 7px}.field input,.field textarea,.field select{display:block;width:100%;background:linear-gradient(#f1e9dc,#fffaf2);color:#382c24;border:1px solid #d6c6b1;border-radius:9px;padding:12px 13px;font-size:15px;min-height:44px;box-shadow:inset 0 2px 4px #4f35201a}.field textarea{min-height:78px;resize:vertical;line-height:1.5}.field select{appearance:auto}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.category-options{display:flex;flex-wrap:wrap;gap:7px}.category-option{padding:10px 11px;border:1px solid #d4c7b6;border-radius:9px;background:linear-gradient(#fffaf2,#e9ddce);font-size:11px;color:#7e6e5e;font-weight:700}.category-option.chosen{border-color:#a2773d;color:#60452d;background:linear-gradient(#ecd6ae,#dcb47b);box-shadow:inset 0 1px #fffc}
+.sheet-actions{display:flex;gap:10px;margin-top:20px}.sheet-actions .metal-button{flex:1;padding:13px 12px;font-size:13px}.danger-button{color:#9f473d;background:none;border:0;font-size:12px;text-decoration:underline;text-underline-offset:3px;padding:8px 4px}.detail-headline{font:normal 29px Georgia,serif;line-height:1.2;margin:2px 0 10px;overflow-wrap:anywhere}.detail-note{color:#7e7062;font-size:14px;line-height:1.65;border-left:3px solid #dbc097;padding-left:11px;margin:22px 0}.detail-facts{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.detail-facts span{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:#796d62}.detail-facts svg{height:15px;width:15px}.detail-move{display:flex;gap:8px;margin:24px 0 12px}.detail-move .metal-button{flex:1}.subhead{font:normal 19px Georgia,serif;margin:25px 0 5px;color:#5d4837}.settings-description{font-size:12px;line-height:1.6;color:#8a7b6c;margin:4px 0 16px}.settings-row{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid #e2d6c6;padding:13px 0}.settings-row strong{font-size:13px;font-weight:700;color:#5f4934}.settings-row small{display:block;margin-top:5px;font-size:11px;color:#97887b}.settings-row .metal-button{padding:9px 12px;min-height:33px}.settings-row select{max-width:120px;border-radius:8px;border:1px solid #c9b9a4;background:#fff9ef;padding:8px}.fineprint{color:#97887b;font-size:11px;line-height:1.55;margin-top:15px}.file-input{display:none}
+.focus-modal{text-align:center}.focus-modal .eyebrow{color:#a18055}.focus-modal h3{font:normal 23px Georgia,serif;margin:10px auto 21px;max-width:300px}.timer-disc{--angle:0deg;margin:15px auto 24px;width:212px;height:212px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#bd955c var(--angle),#d9cdbc 0);box-shadow:0 4px 15px #583f2c17}.timer-face{height:194px;width:194px;border-radius:50%;background:radial-gradient(circle at 30% 22%,#fffdf7,#ece0cf);box-shadow:inset 0 3px 10px #5c4a3326,0 2px 2px #fff;display:flex;flex-direction:column;align-items:center;justify-content:center}.timer-face strong{font-family:Georgia,serif;font-weight:normal;font-size:54px;font-variant-numeric:tabular-nums}.timer-face small{font-size:10px;color:#a48d6e;letter-spacing:.16em;font-weight:800;margin-top:3px}.focus-tip{font-size:12px;line-height:1.6;color:#8b7b67;max-width:260px;margin:19px auto}
+.toast{position:absolute;bottom:calc(91px + env(safe-area-inset-bottom,0px));left:20px;right:20px;z-index:130;background:linear-gradient(#614837,#3a2c25);border:1px solid #ad8c62;border-radius:11px;color:#fff5e2;padding:13px 14px;font-size:12px;box-shadow:0 5px 22px #20160f5c;display:flex;align-items:center;gap:9px;animation:fade-in .18s ease}.toast svg{height:16px;width:16px;color:#e9c183}
+.hidden{display:none!important}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+/* A few alternate leather colors, chosen in Settings */
+.theme-forest{--leather:#384c3d;--leather-2:#58705b;--leather-dark:#26392e;--gold:#b49e61}.theme-night{--leather:#343b4d;--leather-2:#576176;--leather-dark:#272d3d;--gold:#c6a16b}
+/* Keep the navigation reachable while scrolling a long day. */
+.bottom-dock{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;margin-top:0}
+.toast{position:fixed;left:50%;right:auto;transform:translateX(-50%);width:min(440px,calc(100vw - 40px))}
+@media(min-width:580px){
+  .bottom-dock{bottom:34px;max-width:464px;border-radius:0 0 26px 26px}
+  .overlay{position:fixed;top:34px;bottom:34px;left:50%;right:auto;inset:auto;transform:translateX(-50%);width:464px;height:calc(min(850px,100dvh - 52px) - 16px);max-height:calc(100dvh - 68px);overflow:hidden;border-radius:0 0 27px 27px}
+  .toast{bottom:113px}
+}
+
+/* A full-month jump is available, but the daily rhythm remains the home screen. */
+.date-jump{display:flex;gap:11px;align-items:center;color:inherit;background:transparent;border:none;text-align:left;padding:0;cursor:pointer}
+.date-jump svg{width:19px;height:19px;color:#e1bd82;opacity:.85;margin-top:8px}
+.month-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 19px;gap:9px}
+.month-head .metal-button{padding:9px;min-width:42px;min-height:42px}
+.month-head h3{margin:0;font:normal 23px Georgia,serif;letter-spacing:-.03em;color:#63472e}
+.month-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.month-weekday{font-size:10px;font-weight:800;color:#99816a;text-align:center;margin:3px 0 8px}
+.month-spacer{min-height:43px}
+.month-day{min-height:46px;border-radius:9px;background:linear-gradient(#fffaf1,#eee4d4);border:1px solid #decdb9;color:#66523f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:inset 0 1px #fff}
+.month-day strong{font:normal 18px Georgia,serif;line-height:1}
+.month-day.chosen{background:linear-gradient(#855b44,#4f3027);color:#fff9eb;border-color:#513327}
+.month-day.is-today:not(.chosen){border:2px solid #bc8253}
+.month-dot{height:4px;width:4px;border-radius:50%;background:#bb7b46}
+.month-day.chosen .month-dot{background:#e9ce91}
+.month-today{display:block;margin:22px auto 4px}
+.detail-place{display:flex;gap:7px;align-items:center;font-size:13px;color:#846849;margin-top:13px}
+.detail-place svg{height:16px;width:16px}
+
+/* Google Calendar connection: warm paper and polished, 2011-era controls */
+.google-connect-card{margin:0 0 16px;padding:15px;border:1px solid #dbc59f;border-radius:12px;background:linear-gradient(145deg,#fffaf0,#eee0ca);box-shadow:0 2px 10px #75552d18,inset 0 1px #fff}
+.google-connect-title{display:flex;align-items:center;gap:11px}
+.google-connect-title strong{display:block;font:normal 20px Georgia,serif;color:#4a3a2d}
+.google-connect-title small{display:block;color:#8c7458;font-size:11px;margin-top:3px}
+.google-g{font:bold 23px Arial,sans-serif;border:1px solid #d2c5b1;box-shadow:inset 0 1px #fff,0 2px 4px #46321a20;color:#4285f4;width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:linear-gradient(#fff,#f3eee4)}
+.google-status{font-size:12px;color:#75634d;margin:14px 0;line-height:1.6}
+.google-client-field{margin-bottom:9px}.google-client-field input{font-size:11px;min-width:0}
+.google-connect-actions{display:flex;flex-wrap:wrap;gap:7px}.google-connect-actions .metal-button{font-size:11px;padding:10px 8px;flex:1 1 auto}
+.google-connect-actions button:disabled{opacity:.4;cursor:not-allowed}
+.google-connect-card .fineprint{margin-bottom:0}.google-connect-card a{color:#805d36;text-decoration:underline}
+.google-tag{font-weight:900;color:#4285f4;font-family:Arial,sans-serif}
+.google-detail{padding:12px 0;font-size:11px;color:#7b6b5b;border-bottom:1px solid #e5d9c9}
+.switch-line{display:flex;gap:9px;align-items:center;min-height:44px;font-size:13px;color:#564433;margin:5px 0 15px}
+.switch-line input{appearance:auto;width:19px;height:19px;accent-color:#97734f;flex:0 0 19px}
+.switch-line span{display:block}.switch-line small{display:block;color:#998874;font-size:10px;margin-top:3px}
+.google-toggle{border-top:1px solid #e6d9c6;margin:20px 0 0;padding-top:16px}
+
+</style>
+  <title>Daymark — Your day, remixed</title>
+</head>
+<body>
+  <div id="app" class="app-frame" aria-live="off"></div>
+  <script async defer src="https://accounts.google.com/gsi/client"></script>
+  <script>
+/* Daymark: offline-first day planner with optional Google Calendar OAuth. */
+(() => {
+  'use strict';
+  const STORAGE = 'daymark.events.v1';
+  const PREFS = 'daymark.preferences.v1';
+  const FOCUS = 'daymark.focus.v1';
+  const GOOGLE_PREFS = 'daymark.google.v1';
+  const GOOGLE_DELETES = 'daymark.google.deletes.v1';
+  const GOOGLE_SCOPE = 'https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/userinfo.email';
+  let googleToken = null; // OAuth tokens intentionally never go into localStorage.
+  let googleTokenExpires = 0;
+  let googleClient = null;
+  let googleClientFor = '';
+  let googleBusy = false;
+  let googleLastSync = 0;
+  const googleInFlight = new Map();
+  const app = document.getElementById('app');
+  const categories = {
+    Work: { color: '#b78657', label: 'Work' },
+    Personal: { color: '#799583', label: 'Personal' },
+    People: { color: '#b66f66', label: 'People' },
+    Wellness: { color: '#8397a6', label: 'Wellness' },
+    Other: { color: '#9b8a9c', label: 'Other' },
+  };
+  const paths = {
+    settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06-1.91 1.91-.06-.06A1.65 1.65 0 0 0 16 18.4a1.65 1.65 0 0 0-1 1.52V20h-2.7v-.08A1.65 1.65 0 0 0 10.7 18.4a1.65 1.65 0 0 0-1.82.33l-.06.06-1.91-1.91.06-.06A1.65 1.65 0 0 0 7.3 15a1.65 1.65 0 0 0-1.52-1H5.7v-2.7h.08A1.65 1.65 0 0 0 7.3 9.7a1.65 1.65 0 0 0-.33-1.82l-.06-.06L8.82 5.9l.06.06A1.65 1.65 0 0 0 10.7 6.3a1.65 1.65 0 0 0 1-1.52V4.7h2.7v.08A1.65 1.65 0 0 0 16 6.3a1.65 1.65 0 0 0 1.82-.33l.06-.06 1.91 1.91-.06.06A1.65 1.65 0 0 0 19.4 9.7a1.65 1.65 0 0 0 1.52 1h.08v2.7h-.08A1.65 1.65 0 0 0 19.4 15Z"/>',
+    left: '<path d="m15 18-6-6 6-6"/>', right: '<path d="m9 18 6-6-6-6"/>', plus: '<path d="M12 5v14M5 12h14"/>',
+    calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',
+    layers: '<path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/>',
+    check: '<path d="m5 12 4 4L19 6"/>', clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    x: '<path d="M18 6 6 18M6 6l12 12"/>', focus: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',
+    play: '<path d="m8 5 12 7-12 7V5Z"/>', pause: '<path d="M8 5v14M16 5v14"/>',
+    rotate: '<path d="M3 11a9 9 0 1 1 2.7 6.4M3 4v7h7"/>',
+    edit: '<path d="M13 5 19 11M3 21l4.5-1L20 7.5a2.1 2.1 0 0 0-3-3L4.5 17 3 21Z"/>',
+    trash: '<path d="M4 7h16M10 4h4M6 7l1 14h10l1-14M10 11v6M14 11v6"/>',
+    download: '<path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4"/>', upload: '<path d="M12 17V4M7 9l5-5 5 5M4 17v4h16v-4"/>',
+    sunrise: '<path d="M12 2v2m-7 3-2-2m16 2 2-2M3 20h18M5 16a7 7 0 0 1 14 0M3 16h18"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>',
+    moon: '<path d="M20 15.6A8 8 0 0 1 8.4 4 8.3 8.3 0 1 0 20 15.6Z"/>',
+    spark: '<path d="m12 2 2.3 7.7L22 12l-7.7 2.3L12 22l-2.3-7.7L2 12l7.7-2.3L12 2Z"/>',
+  };
+  const icon = (name, cls = '') => `<svg class="${cls}" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || ''}</svg>`;
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const pad = n => String(n).padStart(2, '0');
+  const dateKey = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  const parseDate = value => { const [y, m, d] = value.split('-').map(Number); return new Date(y, m - 1, d, 12); };
+  const addDays = (date, n) => { const next = new Date(date); next.setDate(next.getDate() + n); return next; };
+  const startWeek = date => addDays(date, (date.getDay() + 6) % 7 * -1);
+  const dateLabel = (date, options) => new Intl.DateTimeFormat('en-US', options).format(date);
+  const fmtTime = time => time || '00:00';
+  const getStart = event => { const date = parseDate(event.date); const [h, m] = event.start.split(':').map(Number); date.setHours(h, m, 0, 0); return date; };
+  const isToday = date => dateKey(new Date()) === date;
+  const category = event => categories[event.category] || categories.Other;
+  const sortEvents = events => [...events].sort((a,b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start) || a.title.localeCompare(b.title));
+  const uid = () => (globalThis.crypto && crypto.randomUUID ? crypto.randomUUID() : `e_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`);
+  const readJSON = (key, fallback) => { try { const data = JSON.parse(localStorage.getItem(key)); return data === null ? fallback : data; } catch { return fallback; } };
+  const saveEvents = () => { try { localStorage.setItem(STORAGE, JSON.stringify(state.events)); } catch { showToast('Storage is full. Export a backup.'); } };
+  const savePrefs = () => { try { localStorage.setItem(PREFS, JSON.stringify({ theme: state.theme })); } catch {} };
+  const saveFocus = () => { try { localStorage.setItem(FOCUS, JSON.stringify(state.focus)); } catch {} };
+  const nextHalfHour = () => {
+    const d = new Date(); d.setMinutes(Math.ceil((d.getMinutes() + 1) / 30) * 30, 0, 0);
+    return { date: dateKey(d), start: `${pad(d.getHours())}:${pad(d.getMinutes())}` };
+  };
+  function makeDemo() {
+    const today = new Date();
+    const t = dateKey(today), tomorrow = dateKey(addDays(today, 1));
+    const yesterday = dateKey(addDays(today, -1));
+    return [
+      { id: uid(), date: yesterday, start: '16:00', duration: 60, title: 'Finish the small things', category: 'Personal', note: 'A little breathing room at the end of the day.', done: true },
+      { id: uid(), date: t, start: '08:30', duration: 30, title: 'Morning reset', category: 'Wellness', note: 'Coffee, a clear head, and three priorities.', done: false },
+      { id: uid(), date: t, start: '11:00', duration: 90, title: 'Make something great', category: 'Work', note: 'No notifications. Just your most important project.', done: false },
+      { id: uid(), date: t, start: '15:00', duration: 45, title: 'Catch up with a friend', category: 'People', note: 'The good stuff belongs on your calendar too.', done: false },
+      { id: uid(), date: t, start: '21:30', duration: 30, title: 'Plan tomorrow', category: 'Personal', note: 'A quiet 10 minutes to close the day.', done: false },
+      { id: uid(), date: tomorrow, start: '09:00', duration: 60, title: 'Fresh-start hour', category: 'Work', note: 'Turn one idea into progress.', done: false },
+      { id: uid(), date: tomorrow, start: '18:30', duration: 45, title: 'Go for a walk', category: 'Wellness', note: '', done: false },
+    ];
+  }
+  const storedEvents = readJSON(STORAGE, null);
+  const prefs = readJSON(PREFS, {});
+  const savedFocus = readJSON(FOCUS, null);
+  const googlePrefs = readJSON(GOOGLE_PREFS, {});
+  const state = {
+    events: Array.isArray(storedEvents) ? storedEvents : makeDemo(),
+    date: dateKey(new Date()), weekAnchor: startWeek(new Date()),
+    tab: 'day', filter: 'all', searchQuery: '',
+    modal: null, editId: null, selectedCategory: 'Work', draft: null,
+    calendarMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1, 12),
+    theme: ['walnut', 'forest', 'night'].includes(prefs.theme) ? prefs.theme : 'walnut',
+    focus: savedFocus && typeof savedFocus.remaining === 'number' ? savedFocus : null,
+    googleClientId: typeof googlePrefs.clientId === 'string' ? googlePrefs.clientId : '',
+    googleAccountId: typeof googlePrefs.accountId === 'string' ? googlePrefs.accountId : '',
+    googleEmail: typeof googlePrefs.email === 'string' ? googlePrefs.email : '',
+    googleDeletes: readJSON(GOOGLE_DELETES, []),
+    googleStatus: '',
+  };
+  if (storedEvents === null) saveEvents();
+  function validEvent(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    const title = String(raw.title || '').trim().slice(0, 150);
+    const date = String(raw.date || '');
+    const start = String(raw.start || '');
+    const duration = Number(raw.duration);
+    if (!title || !/^\d{4}-\d{2}-\d{2}$/.test(date) || dateKey(parseDate(date)) !== date || !/^([01]\d|2[0-3]):[0-5]\d$/.test(start) || !Number.isFinite(duration) || duration < 5 || duration > 1440) return null;
+    return { id: /^[a-z0-9_-]{4,100}$/i.test(raw.id || '') ? raw.id : uid(), date, start, duration: Math.round(duration), title, category: categories[raw.category] ? raw.category : 'Other', note: String(raw.note || '').slice(0, 2000), location: String(raw.location || '').slice(0, 200), done: raw.done === true,
+      allDay: raw.allDay === true, googleSync: raw.googleSync === true, googleEventId: typeof raw.googleEventId === 'string' ? raw.googleEventId.slice(0,300) : '', googleDirty: raw.googleDirty === true, googleReadOnly: raw.googleReadOnly === true }; 
+  }
+  state.events = state.events.map(validEvent).filter(Boolean);
+  const dayEvents = () => sortEvents(state.events.filter(e => e.date === state.date));
+  const weekDates = () => Array.from({ length: 7 }, (_, i) => addDays(state.weekAnchor, i));
+  const minutesLabel = n => n < 60 ? `${n} min` : Number.isInteger(n / 60) ? `${n / 60} hr` : `${Math.floor(n / 60)}h ${n % 60}m`;
+  const eventPosition = event => { const start = getStart(event).getTime(), end = start + event.duration * 60000, now = Date.now(); return now >= start && now < end ? 'NOW' : now < start ? 'UP NEXT' : 'PAST'; };
+  const period = time => { const h = +time.split(':')[0]; return h < 12 ? 'Morning' : h < 18 ? 'Afternoon' : 'Evening'; };
+  function header() {
+    const date = parseDate(state.date);
+    return `<header class="leather"><div class="leather-top"><div class="brand"><div class="brand-mark">✦</div><div><div class="brand-name">DAYMARK</div><div class="brand-kicker">${googleConnected() ? '✦ GOOGLE CONNECTED' : 'YOUR DAY, REMIXED'}</div></div></div><button class="circle-tool" data-action="settings" aria-label="Open settings">${icon('settings')}</button></div><div class="hero-date"><div><div class="eyebrow">${state.tab === 'day' ? 'A NEW WAY TO SEE TODAY' : state.tab === 'week' ? 'THE BIGGER PICTURE' : 'EVERY GOOD MOMENT'}</div><button class="date-jump" data-action="open-month" aria-label="Open month and jump to a date"><h1>${state.tab === 'day' ? esc(dateLabel(date, { month:'long', day:'numeric' })) : state.tab === 'week' ? 'Your week.' : 'Your archive.'}</h1>${icon('calendar')}</button></div><div class="live-time"><strong id="liveClock">${clockText()}</strong><small>${state.tab === 'day' ? esc(dateLabel(date, {weekday:'long'})) : 'MAKE TIME COUNT'}</small></div></div></header><div class="leather-divider"></div>`;
+  }
+  const clockText = () => dateLabel(new Date(), { hour: '2-digit', minute: '2-digit', hour12: false });
+  function weekRail() {
+    return `<nav class="week-rail" aria-label="Choose a day"><button class="week-arrow" data-action="week-prev" aria-label="Previous week">${icon('left')}</button><div class="week-days">${weekDates().map(date => { const key = dateKey(date), count = state.events.filter(e => e.date === key).length; return `<button class="day-chip ${key === state.date ? 'is-selected' : ''} ${isToday(key) ? 'today' : ''} ${count ? 'has-events' : ''}" data-action="select-date" data-date="${key}" aria-label="${esc(dateLabel(date,{weekday:'long',month:'long',day:'numeric'}))}${count ? ', ' + count + ' events' : ''}" aria-current="${key === state.date ? 'date':'false'}"><span class="weekday">${dateLabel(date, {weekday:'short'}).slice(0,2).toUpperCase()}</span><span class="day-number">${date.getDate()}</span></button>`; }).join('')}</div><button class="week-arrow" data-action="week-next" aria-label="Next week">${icon('right')}</button></nav>`;
+  }
+  function hero() {
+    const today = state.date === dateKey(new Date());
+    const events = dayEvents().filter(e => !e.done);
+    const current = events.find(e => { const pos = eventPosition(e); return pos === 'NOW'; });
+    const upcoming = events.find(e => getStart(e).getTime() > Date.now());
+    const next = today ? (current || upcoming) : events[0];
+    const total = dayEvents().length, done = dayEvents().filter(e => e.done).length;
+    const tag = next ? (today ? eventPosition(next) : 'FIRST UP') : 'OPEN SPACE';
+    return `<div class="page-padding"><section class="focus-preview" aria-label="Your next moment"><div class="focus-top"><span class="focus-tag">✦ ${tag}</span><span class="pill">${total ? `${done} OF ${total} COMPLETE` : 'A FRESH PAGE'}</span></div><h2>${next ? esc(next.title) : 'Room for possibility.'}</h2><div class="focus-desc">${next ? `${next.allDay ? 'All day' : fmtTime(next.start) + ' · ' + minutesLabel(next.duration)} · ${esc(next.category)}${next.note ? `<br>${esc(next.note)}` : ''}` : 'Your next moment is yours to create. Add something worth making time for.'}</div><div class="focus-actions"><button class="metal-button primary" data-action="${next ? 'start-focus' : 'add'}" ${next ? `data-id="${esc(next.id)}"` : ''}>${icon(next ? 'focus' : 'plus')} ${next ? 'Enter focus' : 'Make a plan'}</button><button class="quiet-action" data-action="${today ? 'tab' : 'today'}" ${today ? 'data-value="week"' : ''}>${today ? 'See this week' : 'Jump to today'} →</button></div></section></div>`;
+  }
+  function filteredEvents(events) { return events.filter(e => state.filter === 'all' || (state.filter === 'open' && !e.done) || (state.filter === 'done' && e.done)); }
+  function eventCard(event) {
+    const cat = category(event);
+    return `<div class="event-item" style="--dot-color:${cat.color}"><div class="event-time">${event.allDay ? 'ALL DAY' : esc(event.start)}<small>${event.allDay ? '' : minutesLabel(event.duration)}</small></div><div class="timeline"><div class="timeline-dot"></div><div class="timeline-stem"></div></div><button class="event-card ${event.done ? 'done' : ''}" data-action="details" data-id="${esc(event.id)}" aria-label="View ${esc(event.title)}"><div class="event-card-main"><div class="event-title">${esc(event.title)}</div><div class="event-meta"><i class="tiny-dot"></i>${esc(event.category)}${event.googleSync ? ' · <span class="google-tag">G</span> Google' : ''}${event.location ? ' · ' + esc(event.location) : ''}${isToday(event.date) && eventPosition(event) === 'NOW' && !event.done ? ' · Happening now' : ''}</div>${event.note ? `<div class="event-note">${esc(event.note)}</div>` : ''}</div></button><button class="check-circle ${event.done ? 'checked':''}" data-action="toggle-done" data-id="${esc(event.id)}" aria-label="${event.done ? 'Mark not done' : 'Mark complete'}: ${esc(event.title)}" aria-pressed="${event.done}">${icon('check')}</button></div>`;
+  }
+  function dayView() {
+    const all = dayEvents(), visible = filteredEvents(all);
+    const done = all.filter(e => e.done).length;
+    const periods = ['Morning','Afternoon','Evening'];
+    return `${weekRail()}${hero()}<div class="page-padding"><div class="rhythm-bar"><div class="section-label"><div><div class="eyebrow">THE LITTLE THINGS ADD UP</div><h2>Today's rhythm</h2></div></div><div class="progress-chip"><span class="progress-ring" style="--progress:${all.length ? Math.round(done / all.length * 100) : 0}%"></span>${done}/${all.length}</div></div><div class="segmented" role="group" aria-label="Filter events"><button class="${state.filter === 'all' ? 'active' : ''}" data-action="filter" data-value="all" aria-pressed="${state.filter === 'all'}">Everything</button><button class="${state.filter === 'open' ? 'active' : ''}" data-action="filter" data-value="open" aria-pressed="${state.filter === 'open'}">To do</button><button class="${state.filter === 'done' ? 'active' : ''}" data-action="filter" data-value="done" aria-pressed="${state.filter === 'done'}">Finished</button></div>${visible.length ? periods.map(p => { const events = visible.filter(e => period(e.start) === p); return events.length ? `<div class="period-heading">${icon(p === 'Morning' ? 'sunrise' : p === 'Afternoon' ? 'sun' : 'moon')}<span>${p}</span></div><div class="event-list">${events.map(eventCard).join('')}</div>` : ''; }).join('') : `<div class="empty-state"><div class="empty-symbol">✧</div><h3>${all.length ? 'Nothing here yet.' : 'A beautifully blank day.'}</h3><p>${all.length ? 'Switch your filter, or add another plan.' : 'Give this day its first little moment.'}</p><button class="metal-button primary" data-action="add">${icon('plus')} Add a moment</button></div>`}<div class="end-mark">✦ &nbsp; MAKE TODAY YOURS &nbsp; ✦</div></div>`;
+  }
+  function weekView() {
+    const dates = weekDates();
+    const count = dates.reduce((n,d) => n + state.events.filter(e => e.date === dateKey(d)).length,0);
+    const done = dates.reduce((n,d) => n + state.events.filter(e => e.date === dateKey(d) && e.done).length,0);
+    return `${weekRail()}<main class="page-padding"><div class="view-intro"><div class="eyebrow">SEVEN DAYS, ONE STORY</div><h2>Make it a good week.</h2><p>Not a wall of tiny boxes. Just each day, and what matters in it.</p></div>${dates.map(date => {
+      const key = dateKey(date), evts = sortEvents(state.events.filter(e => e.date === key));
+      return `<button class="week-card ${key === state.date ? 'selected':''}" data-action="open-day" data-date="${key}"><span class="week-date-badge"><small>${dateLabel(date,{weekday:'short'}).toUpperCase()}</small><strong>${date.getDate()}</strong></span><span class="week-content"><strong>${isToday(key) ? 'Today' : dateLabel(date,{weekday:'long'})}${key === state.date ? ' ✦' : ''}</strong><p>${evts.length ? evts.map(e => esc(e.title)).join(' · ') : 'A little room to breathe'}</p><span class="mini-bars">${evts.slice(0,8).map(e => `<i class="${e.done?'done':''}" style="background:${e.done ? '#74917c' : category(e).color}"></i>`).join('')}</span></span><span class="week-chevron">${icon('right')}</span></button>`;
+    }).join('')}<div class="week-progress">${count ? `${done} of ${count} moments completed this week` : 'Nothing planned yet. Endless possibilities.'}</div></main>`;
+  }
+  function findView() {
+    return `<main class="page-padding"><div class="view-intro"><div class="eyebrow">YOUR MOMENTS, ALL IN ONE PLACE</div><h2>Find your time.</h2><p>Search all your plans, notes, and people.</p></div><label class="search-box">${icon('search')}<input id="searchInput" type="search" placeholder="Search moments, notes, categories…" value="${esc(state.searchQuery)}" autocomplete="off" aria-label="Search all events"/></label><div id="searchResults">${searchResults()}</div></main>`;
+  }
+  function searchResults() {
+    const q = state.searchQuery.toLowerCase().trim();
+    const events = sortEvents(state.events).filter(e => !q || `${e.title} ${e.note} ${e.location || ''} ${e.category} ${e.date}`.toLowerCase().includes(q));
+    if (!events.length) return `<div class="empty-state"><div class="empty-symbol">⌕</div><h3>No moments found.</h3><p>Try a different word, or add something new.</p><button class="metal-button primary" data-action="add">${icon('plus')} Add a moment</button></div>`;
+    let last = '';
+    const list = events.map(e => { const label = dateLabel(parseDate(e.date), {month:'long',day:'numeric',year:'numeric'}); const heading = e.date !== last ? `<div class="result-date">${esc(label)}</div>` : ''; last=e.date;
+      return `${heading}<button class="search-result" data-action="details" data-id="${esc(e.id)}"><span class="result-time">${e.allDay ? 'ALL DAY' : esc(e.start)}</span><strong>${esc(e.title)}${e.done ? ' ✓' : ''}</strong><span class="pill">${esc(e.category)}</span></button>`;
+    }).join('');
+    return `<div class="subtle-text">${events.length} ${events.length === 1 ? 'moment' : 'moments'} found</div>${list}`;
+  }
+  function dock() {
+    return `<nav class="bottom-dock" aria-label="Main navigation"><button class="dock-tab ${state.tab==='day'?'active':''}" data-action="tab" data-value="day" aria-current="${state.tab==='day'?'page':'false'}">${icon('calendar')}<span>DAY</span></button><button class="dock-tab ${state.tab==='week'?'active':''}" data-action="tab" data-value="week" aria-current="${state.tab==='week'?'page':'false'}">${icon('layers')}<span>WEEK</span></button><button class="dock-add" data-action="add" aria-label="Add a moment">${icon('plus')}</button><button class="dock-tab ${state.tab==='find'?'active':''}" data-action="tab" data-value="find" aria-current="${state.tab==='find'?'page':'false'}">${icon('search')}<span>FIND</span></button><button class="dock-tab" data-action="today" aria-label="Jump to today">${icon('spark')}<span>TODAY</span></button></nav>`;
+  }
+  function render() {
+    app.className = `app-frame theme-${state.theme}`;
+    app.innerHTML = `${header()}<div class="paper main-content">${state.tab==='day' ? dayView() : state.tab==='week' ? weekView() : findView()}</div>${dock()}<div id="overlayRoot"></div>`;
+    if (state.modal) renderModal();
+  }
+  function sheet(title, kicker, content) {
+    return `<div class="overlay" data-overlay="true"><section class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="sheet-header"><div><div class="eyebrow">${esc(kicker)}</div><h2>${esc(title)}</h2></div><button class="close-sheet" data-action="close" aria-label="Close dialog">${icon('x')}</button></div><div class="sheet-body">${content}</div></section></div>`;
+  }
+  function renderModal() {
+    const root = document.getElementById('overlayRoot'); if (!root) return;
+    if (state.modal === 'editor') {
+      const e = state.draft || {};
+      const choices = Object.keys(categories).map(key => `<button type="button" class="category-option ${state.selectedCategory === key?'chosen':''}" data-action="category" data-value="${key}" aria-pressed="${state.selectedCategory === key}"><span style="color:${categories[key].color}">●</span> ${key}</button>`).join('');
+      root.innerHTML = sheet(state.editId ? 'Edit your moment' : 'A new moment', 'MAKE A LITTLE ROOM', `<form id="eventForm"><label class="field"><span>What are you making time for?</span><input name="title" placeholder="Give this moment a name" maxlength="150" required value="${esc(e.title || '')}" autocomplete="off"></label><label class="field"><span>Date</span><input name="date" type="date" required value="${esc(e.date || state.date)}"></label><label class="switch-line"><input type="checkbox" name="allDay" id="allDayInput" ${e.allDay ? 'checked' : ''}><span>All-day moment</span></label><div class="form-row" id="timedFields" ${e.allDay ? 'style="display:none"' : ''}><label class="field"><span>Start time</span><input name="start" type="time" value="${esc(e.start || '09:00')}"></label><label class="field"><span>Duration</span><select name="duration">${[15,30,45,60,90,120,180,240].map(n => `<option value="${n}" ${Number(e.duration || 60) === n ? 'selected':''}>${minutesLabel(n)}</option>`).join('')}</select></label></div><div class="field"><span>Part of life</span><div class="category-options">${choices}</div><input name="category" id="categoryInput" type="hidden" value="${esc(state.selectedCategory)}"></div><label class="field"><span>Notes (optional)</span><textarea name="note" maxlength="2000" placeholder="A little detail to remember…">${esc(e.note || '')}</textarea></label><label class="field"><span>Location (optional)</span><input name="location" placeholder="Where?" maxlength="200" value="${esc(e.location || '')}"></label><label class="switch-line google-toggle"><input type="checkbox" name="googleSync" ${e.googleSync || (!state.editId && googleConnected()) ? 'checked' : ''} ${!googleConnected() && !e.googleSync ? 'disabled' : ''}><span>Save to Google Calendar <small>${googleConnected() ? 'Sync with your primary calendar' : 'Connect Google in Settings first'}</small></span></label><div class="sheet-actions"><button type="button" class="metal-button" data-action="close">Cancel</button><button type="submit" class="metal-button primary">${icon('check')} ${state.editId ? 'Save changes' : 'Save moment'}</button></div></form>`);
+      setTimeout(() => root.querySelector('[name="title"]')?.focus({preventScroll:true}), 150);
+    } else if (state.modal === 'details') {
+      const e = state.events.find(evt => evt.id === state.editId);
+      if (!e) { state.modal=null; root.innerHTML=''; return; }
+      root.innerHTML = sheet('Your moment', 'THE DETAILS', `<div class="eyebrow" style="color:${category(e).color}">● ${esc(e.category)}</div><h3 class="detail-headline">${esc(e.title)}</h3><div class="detail-facts"><span>${icon('calendar')} ${esc(dateLabel(parseDate(e.date), {weekday:'short',month:'short',day:'numeric'}))}</span><span>${icon('clock')} ${e.allDay ? 'All day' : esc(e.start) + ' · ' + minutesLabel(e.duration)}</span></div>${e.location ? `<div class="detail-place">${icon('calendar')} ${esc(e.location)}</div>` : ''}${e.note ? `<p class="detail-note">${esc(e.note).replace(/\n/g,'<br>')}</p>` : ''}<div class="google-detail">${e.googleSync ? '<span class="google-tag">G</span> Linked to Google Calendar' + (e.googleDirty ? ' · waiting to sync' : '') : 'Only on this device'}</div><h4 class="subhead">Make some space</h4><div class="detail-move">${e.googleReadOnly ? 'This multi-day Google event can be viewed here but should be edited in Google Calendar.' : `<button class="metal-button" data-action="move" data-delta="-15">− 15 min</button><button class="metal-button" data-action="move" data-delta="15">+ 15 min</button>`}</div><div class="sheet-actions"><button class="metal-button" data-action="toggle-done" data-id="${esc(e.id)}">${icon('check')} ${e.done ? 'Mark unfinished' : 'Mark complete'}</button>${e.googleReadOnly ? '' : `<button class="metal-button primary" data-action="edit" data-id="${esc(e.id)}">${icon('edit')} Edit</button>`}</div><div class="sheet-actions" style="justify-content:center"><button class="danger-button" data-action="delete" data-id="${esc(e.id)}">${icon('trash')} Delete this moment</button></div>`);
+    } else if (state.modal === 'month') {
+      const m = state.calendarMonth;
+      const y = m.getFullYear(), month = m.getMonth();
+      const lead = (new Date(y,month,1).getDay()+6)%7;
+      const days = new Date(y,month+1,0).getDate();
+      const weekdayLabels = ['M','T','W','T','F','S','S'];
+      const cells = Array.from({length:lead},() => `<span class="month-spacer"></span>`).join('') + Array.from({length:days}, (_,i) => {
+        const day=i+1,key=dateKey(new Date(y,month,day,12));
+        const count=state.events.filter(e=>e.date===key).length;
+        return `<button class="month-day ${key===state.date?'chosen':''} ${isToday(key)?'is-today':''}" data-action="month-day" data-date="${key}" aria-label="${esc(dateLabel(parseDate(key),{weekday:'long',month:'long',day:'numeric'}))}${count?', '+count+' events':''}"><strong>${day}</strong>${count?`<span class="month-dot"></span>`:''}</button>`;
+      }).join('');
+      root.innerHTML=sheet('Choose your day', 'YOUR WHOLE MONTH', `<div class="month-head"><button class="metal-button" data-action="month-prev" aria-label="Previous month">${icon('left')}</button><h3>${esc(dateLabel(m,{month:'long',year:'numeric'}))}</h3><button class="metal-button" data-action="month-next" aria-label="Next month">${icon('right')}</button></div><div class="month-grid">${weekdayLabels.map(x=>`<span class="month-weekday">${x}</span>`).join('')}${cells}</div><button class="metal-button month-today" data-action="month-today">Jump to today</button>`);
+    } else if (state.modal === 'settings') {
+      root.innerHTML = sheet('Make it yours', 'THE LITTLE EXTRAS', `<p class="settings-description">Your personal day planner, with optional Google Calendar synchronization.</p><div class="google-connect-card"><div class="google-connect-title"><span class="google-g">G</span><div><strong>Google Calendar</strong><small>${googleConnected() ? `Connected as ${esc(state.googleEmail || 'your Google account')}` : state.googleClientId ? 'Ready to connect' : 'One-time Google Cloud setup'}</small></div></div><p class="google-status" role="status">${esc(state.googleStatus || (googleConnected() ? 'Your primary Google Calendar is connected. Tap Sync now to refresh.' : 'Connect to see your Google events here and edit them from Daymark.'))}</p><label class="field google-client-field"><span>Google OAuth Web Client ID</span><input id="googleClientId" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(state.googleClientId)}" placeholder="000000000-xxxxx.apps.googleusercontent.com"></label><div class="google-connect-actions"><button class="metal-button primary" data-action="google-connect">${googleConnected() ? 'Change account' : 'Connect Google'}</button><button class="metal-button" data-action="google-sync" ${googleConnected() ? '' : 'disabled'}>↻ Sync now</button>${googleConnected() ? '<button class="metal-button" data-action="google-disconnect">Disconnect</button>' : ''}</div><p class="fineprint">Google sync covers your primary calendar, from 30 days ago to one year ahead. Only moments marked for Google are uploaded. Requires internet and a Google Cloud OAuth Client ID. <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">Google Cloud setup ↗</a></p></div><div class="settings-row"><div><strong>Cover style</strong><small>A little 2011 nostalgia.</small></div><select id="themeSelect" aria-label="Color theme"><option value="walnut" ${state.theme==='walnut'?'selected':''}>Walnut</option><option value="forest" ${state.theme==='forest'?'selected':''}>Forest</option><option value="night" ${state.theme==='night'?'selected':''}>Midnight</option></select></div><h4 class="subhead">Keep your moments</h4><div class="settings-row"><div><strong>Export to calendar</strong><small>Download an .ics file for Apple or Google Calendar.</small></div><button class="metal-button" data-action="export-ics">${icon('download')} .ICS</button></div><div class="settings-row"><div><strong>Back up your planner</strong><small>A JSON copy of every saved moment.</small></div><button class="metal-button" data-action="export-json">${icon('download')} JSON</button></div><div class="settings-row"><div><strong>Import a backup</strong><small>Add moments from an exported JSON file.</small></div><button class="metal-button" data-action="import">${icon('upload')} Import</button></div><input class="file-input" type="file" id="importFile" accept="application/json,.json"><h4 class="subhead">Start fresh</h4><div class="settings-row"><div><strong>Restore sample plans</strong><small>Replace your plans with the original demo.</small></div><button class="metal-button" data-action="reset-demo">Restore</button></div><div class="settings-row"><div><strong>Clear every plan</strong><small>Erase local data here, not on Google.</small></div><button class="danger-button" data-action="clear-all">Clear all</button></div><p class="fineprint">Daymark works offline after its first visit when installed from an HTTPS website. Google events sync while you're connected and online; reconnect when your session expires. Local-only events stay on this phone. Background reminders aren't included. Export to keep a backup.</p>`);
+    } else if (state.modal === 'focus') {
+      const e = state.events.find(evt => evt.id === state.focus?.eventId);
+      if (!e) { state.modal = null; root.innerHTML=''; return; }
+      root.innerHTML = sheet('Focus on this', 'ONE THING AT A TIME', `<div class="focus-modal"><h3>${esc(e.title)}</h3><div id="timerDisc" class="timer-disc"><div class="timer-face"><strong id="timerText">25:00</strong><small>FOCUS SESSION</small></div></div><div class="sheet-actions"><button class="metal-button" data-action="focus-reset" aria-label="Reset focus timer">${icon('rotate')} Reset</button><button class="metal-button primary" id="focusToggle" data-action="focus-toggle">${icon('play')} Start focus</button></div><div class="focus-tip">A quieter way to get things done. This timer runs while the app is open; it also catches up when you return.</div><button class="quiet-action" data-action="close">Back to my day →</button></div>`);
+      updateTimerUI();
+    }
+  }
+  function openEditor(id = null, defaults = {}) {
+    const e = id ? state.events.find(evt => evt.id === id) : null;
+    const next = nextHalfHour();
+    state.editId = id;
+    state.selectedCategory = e?.category || defaults.category || 'Work';
+    state.draft = e ? { ...e } : { date: state.date, start: (state.date === next.date ? next.start : '09:00'), duration: 60, ...defaults };
+    state.modal = 'editor'; renderModal();
+  }
+  function closeModal() { state.modal = null; state.editId = null; state.draft = null; const el = document.getElementById('overlayRoot'); if (el) el.innerHTML=''; }
+  function showToast(message) {
+    app.querySelector('.toast')?.remove();
+    const el = document.createElement('div'); el.className='toast'; el.setAttribute('role','status'); el.innerHTML=`${icon('spark')}<span>${esc(message)}</span>`; app.append(el);
+    setTimeout(() => el.remove(), 3400);
+  }
+  function updateSelectedDate(key) { state.date = key; state.weekAnchor = startWeek(parseDate(key)); state.tab = 'day'; state.filter = 'all'; render(); }
+  function getEvent(id) { return state.events.find(e => e.id === id); }
+  // Google API integration: an ephemeral, user-authorized OAuth access token.
+  // Client IDs are public; client secrets and access tokens are never persisted.
+  function googleConnected() { return Boolean(googleToken && Date.now() < googleTokenExpires - 20000); }
+  function saveGoogleConfig() { localStorage.setItem(GOOGLE_PREFS, JSON.stringify({clientId:state.googleClientId,accountId:state.googleAccountId,email:state.googleEmail})); }
+  function saveGoogleDeletes() { localStorage.setItem(GOOGLE_DELETES, JSON.stringify(state.googleDeletes)); }
+  function googleStatus(message) { state.googleStatus = message; if (state.modal === 'settings') renderModal(); }
+  function googleError(e) {
+    if (e.status === 401) { googleToken = null; googleTokenExpires = 0; googleStatus('Google session expired. Tap Connect Google again.'); }
+    else googleStatus(e.message || 'Could not sync Google Calendar. Check your internet connection.');
+    showToast(e.message || 'Google Calendar is unavailable');
+  }
+  async function googleRequest(path, options={}) {
+    if (!googleConnected()) throw new Error('Google session expired. Reconnect in Settings.');
+    const response = await fetch('https://www.googleapis.com/' + path.replace(/^\//,''), {
+      ...options,
+      headers: {Authorization: 'Bearer ' + googleToken, ...(options.body ? {'Content-Type':'application/json'} : {}), ...options.headers},
+    });
+    if (response.status === 204) return {};
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) { const e = new Error(data.error?.message || `Google API returned ${response.status}`); e.status = response.status; throw e; }
+    return data;
+  }
+  function googleEventPayload(e) {
+    const payload = {
+      summary: e.title,
+      description: e.note || '',
+      location: e.location || '',
+      extendedProperties: {private: {daymarkId:e.id, daymarkCategory:e.category}},
+    };
+    if (e.allDay) {
+      payload.start = {date: e.date};
+      payload.end = {date: dateKey(addDays(parseDate(e.date), 1))};
+    } else {
+      const start = getStart(e);
+      const end = new Date(start.getTime() + e.duration * 60000);
+      payload.start = {dateTime: start.toISOString()};
+      payload.end = {dateTime: end.toISOString()};
+    }
+    return payload;
+  }
+  function fromGoogle(remote, previous) {
+    if (!remote.id || !(remote.start?.dateTime || remote.start?.date) || !(remote.end?.dateTime || remote.end?.date)) return null;
+    const allDay = Boolean(remote.start.date);
+    const start = allDay ? parseDate(remote.start.date) : new Date(remote.start.dateTime);
+    const end = allDay ? addDays(start, 1) : new Date(remote.end.dateTime);
+    if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime())) return null;
+    const duration = allDay ? 1440 : Math.max(5, Math.round((end - start) / 60000));
+    const raw = {
+      id: previous?.id || remote.extendedProperties?.private?.daymarkId || uid(),
+      title: remote.summary || '(Untitled event)',
+      date: dateKey(start), start: allDay ? '00:00' : `${pad(start.getHours())}:${pad(start.getMinutes())}`,
+      duration: Math.min(1440,duration), category: previous?.category || remote.extendedProperties?.private?.daymarkCategory || 'Personal',
+      note: remote.description || '', location: remote.location || '', done: previous?.done || false,
+      allDay, googleSync:true, googleEventId:remote.id, googleDirty:false,
+      googleReadOnly: duration > 1440 || (allDay && remote.end.date && Math.round((parseDate(remote.end.date)-start)/86400000)>1),
+    };
+    return validEvent(raw);
+  }
+  async function pushGoogleEvent(e) {
+    if (!e?.googleSync || !e.googleDirty || e.googleReadOnly) return;
+    const existing = googleInFlight.get(e.id);
+    if (existing) return existing;
+    const task = (async () => {
+      const current = getEvent(e.id) || e;
+      const payload = googleEventPayload(current);
+      const base = 'calendar/v3/calendars/primary/events';
+      const path = current.googleEventId ? `${base}/${encodeURIComponent(current.googleEventId)}` : base;
+      const remote = await googleRequest(path, {method:current.googleEventId ? 'PATCH' : 'POST',body:JSON.stringify(payload)});
+      const latest = getEvent(e.id);
+      if (!latest) {
+        // The user deleted the moment while its creation was still in flight.
+        if (remote.id) {state.googleDeletes.push({eventId:remote.id, accountId:state.googleAccountId});saveGoogleDeletes();if(googleConnected())void flushGoogleDeletes().catch(googleError);}
+        return;
+      }
+      latest.googleEventId = remote.id || latest.googleEventId;
+      latest.googleDirty = JSON.stringify(googleEventPayload(latest)) !== JSON.stringify(payload);
+      saveEvents();
+    })();
+    googleInFlight.set(e.id, task);
+    try {await task;} finally {googleInFlight.delete(e.id);}
+  }
+  async function removeGoogleEvent(e) {
+    if (!e.googleSync || !e.googleEventId) return;
+    state.googleDeletes.push({eventId:e.googleEventId, accountId:state.googleAccountId});
+    saveGoogleDeletes();
+    if (googleConnected()) {
+      try { await flushGoogleDeletes(); googleStatus('Google event deleted.'); }
+      catch (error) { googleError(error); }
+    } else showToast('Will remove from Google when you reconnect and sync');
+  }
+  async function flushGoogleDeletes() {
+    for (const item of [...state.googleDeletes]) {
+      if (item.accountId !== state.googleAccountId) continue;
+      try { await googleRequest(`calendar/v3/calendars/primary/events/${encodeURIComponent(item.eventId)}`, {method:'DELETE'}); }
+      catch (error) { if (error.status !== 404 && error.status !== 410) throw error; }
+      state.googleDeletes = state.googleDeletes.filter(x => x !== item); saveGoogleDeletes();
+    }
+  }
+  async function syncGoogle({silent=false}={}) {
+    if (googleBusy || !googleConnected()) { if (!googleConnected()) showToast('Connect Google Calendar in Settings'); return; }
+    googleBusy = true;
+    googleStatus('Syncing your primary calendar…');
+    try {
+      await flushGoogleDeletes();
+      for (const e of state.events.filter(v => v.googleSync && v.googleDirty)) await pushGoogleEvent(e);
+      const min = addDays(new Date(), -30), max = addDays(new Date(), 365);
+      const startIso = new Date(min.getFullYear(),min.getMonth(),min.getDate()).toISOString();
+      const endIso = new Date(max.getFullYear(),max.getMonth(),max.getDate()+1).toISOString();
+      const remoteEvents = [];
+      let next = '';
+      do {
+        const q = new URLSearchParams({timeMin:startIso,timeMax:endIso,singleEvents:'true',orderBy:'startTime',maxResults:'2500',showDeleted:'false'});
+        if (next) q.set('pageToken',next);
+        const page = await googleRequest('calendar/v3/calendars/primary/events?' + q.toString());
+        remoteEvents.push(...(page.items || []));
+        next = page.nextPageToken || '';
+      } while(next);
+      const seen = new Set();
+      let added = 0;
+      for (const remote of remoteEvents) {
+        if (remote.status === 'cancelled') continue;
+        const originalId = remote.extendedProperties?.private?.daymarkId;
+        const prev = state.events.find(x => (x.googleSync && x.googleEventId === remote.id) || (originalId && x.id === originalId));
+        const local = fromGoogle(remote, prev);
+        if (!local) continue;
+        seen.add(remote.id);
+        if (prev) Object.assign(prev, local);
+        else { if (state.events.some(x=>x.id===local.id)) local.id=uid(); state.events.push(local); added++; }
+      }
+      // Within the refreshed time window, events removed from Google disappear from the local mirror.
+      state.events = state.events.filter(e => !e.googleSync || !e.googleEventId || !e.date || e.date < dateKey(min) || e.date > dateKey(max) || seen.has(e.googleEventId));
+      saveEvents();
+      googleLastSync = Date.now();
+      render();
+      googleStatus(`Synced ${remoteEvents.length} Google events · ${added} newly added. Last checked ${clockText()}.`);
+      if (!silent) showToast(`Google Calendar synced · ${remoteEvents.length} events`);
+    } catch(error) { googleError(error); }
+    finally { googleBusy=false; }
+  }
+  async function syncOneGoogleEvent(e) {
+    if (!e.googleSync || !e.googleDirty || !googleConnected()) return;
+    try { await pushGoogleEvent(e); const latest=getEvent(e.id); if (latest?.googleDirty) await pushGoogleEvent(latest); if (state.modal === 'details') renderModal(); }
+    catch(error) { googleError(error); }
+  }
+  function connectGoogle() {
+    const value = document.getElementById('googleClientId')?.value.trim() || state.googleClientId;
+    if (!/^\d+-[\w-]+\.apps\.googleusercontent\.com$/.test(value)) { showToast('Enter your Google OAuth Web Client ID first'); return; }
+    state.googleClientId = value;saveGoogleConfig();
+    if (!window.google?.accounts?.oauth2?.initTokenClient) { showToast('Google Sign-In is not loaded. Connect to internet and reopen this page in Safari.'); return; }
+    if (!googleClient || googleClientFor !== value) {
+      googleClient = window.google.accounts.oauth2.initTokenClient({
+        client_id:value, scope:GOOGLE_SCOPE,
+        callback:async result => {
+          if (result.error || !result.access_token) {googleStatus(result.error_description || 'Google authorization cancelled.');return;}
+          googleToken=result.access_token;
+          googleTokenExpires=Date.now()+Math.max(60,Number(result.expires_in)||3600)*1000;
+          try {
+            const who=await googleRequest('oauth2/v3/userinfo');
+            if (!who.sub) throw new Error('Could not verify Google account');
+            if (state.googleAccountId && state.googleAccountId !== who.sub) {
+              if (!confirm('A different Google account was previously linked here. Keep its events as local-only moments and switch to this Google account?')) { googleToken=null;googleTokenExpires=0;return; }
+              state.events.forEach(e=>{ if(e.googleSync){e.googleSync=false;e.googleDirty=false;e.googleEventId='';} });
+              state.googleDeletes=[];saveGoogleDeletes();saveEvents();
+            }
+            state.googleAccountId=who.sub;state.googleEmail=who.email || '';
+            saveGoogleConfig();
+            render();await syncGoogle();
+          } catch(error){googleToken=null;googleTokenExpires=0;googleError(error);}
+        },
+        error_callback:e=>showToast('Google sign-in could not open. Try Safari instead of the Home Screen app.'),
+      });
+      googleClientFor=value;
+    }
+    // Directly invoked from a tap/click to satisfy iOS popup gesture requirements.
+    googleClient.requestAccessToken({prompt:'select_account'});
+  }
+  function disconnectGoogle() {
+    if (!confirm('Disconnect this Google session? Your imported Google moments stay visible locally. You can also revoke access from your Google Account settings.')) return;
+    googleToken=null;googleTokenExpires=0;
+    state.googleStatus='Disconnected. Sign in again any time.';
+    renderModal();showToast('Google disconnected');
+  }
+  function moveEvent(id, delta) {
+    const event = getEvent(id); if (!event) return;
+    const newStart = getStart(event); newStart.setMinutes(newStart.getMinutes() + delta);
+    event.date = dateKey(newStart); event.start = `${pad(newStart.getHours())}:${pad(newStart.getMinutes())}`;
+    if (event.googleSync && !event.googleReadOnly) event.googleDirty = true;
+    saveEvents(); if (event.googleSync) void syncOneGoogleEvent(event); state.date = event.date; state.weekAnchor = startWeek(parseDate(state.date)); render(); showToast(`Moved to ${event.start}`);
+  }
+  function startFocus(id) {
+    if (!getEvent(id)) return;
+    if (!state.focus || state.focus.eventId !== id) state.focus = { eventId:id, remaining:1500, length:1500, endAt:null, running:false };
+    state.modal='focus'; state.editId = id; saveFocus(); renderModal();
+  }
+  function remainingFocus() {
+    if (!state.focus) return 0;
+    return state.focus.running ? Math.max(0,Math.ceil((state.focus.endAt - Date.now())/1000)) : state.focus.remaining;
+  }
+  function updateTimerUI() {
+    if (!state.focus) return;
+    const remaining = remainingFocus();
+    const text = document.getElementById('timerText');
+    const disc = document.getElementById('timerDisc');
+    const btn = document.getElementById('focusToggle');
+    if (text) text.textContent = `${pad(Math.floor(remaining/60))}:${pad(remaining%60)}`;
+    if (disc) disc.style.setProperty('--angle', `${(1-remaining/state.focus.length)*360}deg`);
+    if (btn) btn.innerHTML = remaining === 0 ? `${icon('rotate')} Again` : state.focus.running ? `${icon('pause')} Pause` : `${icon('play')} ${remaining === state.focus.length ? 'Start focus' : 'Continue'}`;
+    if (state.focus.running && remaining === 0) { state.focus.running=false;state.focus.endAt=null;state.focus.remaining=0;saveFocus();showToast('Focus session complete. Beautiful work!'); }
+  }
+  function focusToggle() {
+    if (!state.focus) return;
+    const remaining = remainingFocus();
+    if (!remaining) { state.focus.remaining=state.focus.length; state.focus.endAt=null; state.focus.running=false; }
+    else if (state.focus.running) { state.focus.remaining=remaining;state.focus.endAt=null;state.focus.running=false; }
+    else { state.focus.endAt=Date.now()+remaining*1000;state.focus.running=true; }
+    saveFocus(); updateTimerUI();
+  }
+  function download(name, content, mime) {
+    const blob = new Blob([content],{type:mime});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
+  }
+  const icsEscape = value => String(value).replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');
+  function exportIcs() {
+    const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DAYMARK//DAYMARK PLANNER//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:Daymark'];
+    sortEvents(state.events).forEach(e => {
+      const start=getStart(e),end=new Date(start.getTime()+e.duration*60000);
+      const dt=date=>`${date.getFullYear()}${pad(date.getMonth()+1)}${pad(date.getDate())}T${pad(date.getHours())}${pad(date.getMinutes())}00`;
+      lines.push('BEGIN:VEVENT',`UID:${icsEscape(e.id)}@daymark.local`,`DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'')}`,`DTSTART:${dt(start)}`,`DTEND:${dt(end)}`,`SUMMARY:${icsEscape(e.title)}`,`DESCRIPTION:${icsEscape(e.note)}`,`LOCATION:${icsEscape(e.location || '')}`,`CATEGORIES:${icsEscape(e.category)}`,'END:VEVENT');
+    });
+    lines.push('END:VCALENDAR');
+    download('daymark-calendar.ics',lines.join('\r\n')+'\r\n','text/calendar;charset=utf-8');
+    showToast(`${state.events.length} moments exported to calendar`);
+  }
+  function exportJson() {
+    download('daymark-backup.json',JSON.stringify({app:'Daymark',version:1,exportedAt:new Date().toISOString(),events:sortEvents(state.events)},null,2),'application/json;charset=utf-8');
+    showToast('Your backup is ready');
+  }
+  async function importJson(file) {
+    if (!file) return;
+    if (file.size > 5e6) { showToast('That file is too large (5 MB max).'); return; }
+    try {
+      const raw=JSON.parse(await file.text());
+      if (!raw || !Array.isArray(raw.events)) throw new Error('Invalid format');
+      const events=raw.events.map(validEvent).filter(Boolean);
+      if (!events.length && raw.events.length) throw new Error('No valid events');
+      const ids = new Set(state.events.map(e => e.id));
+      let count=0;
+      for (const evt of events) { if (ids.has(evt.id)) evt.id=uid(); evt.googleSync=false; evt.googleEventId='';evt.googleDirty=false;state.events.push(evt);ids.add(evt.id);count++; }
+      saveEvents();closeModal();render();showToast(`${count} moments added from backup`);
+    } catch { showToast('Could not read this backup. Use Daymark JSON.'); }
+  }
+  function handleAction(action, el) {
+    const id=el.dataset.id;
+    switch(action) {
+      case 'open-month':state.calendarMonth=new Date(parseDate(state.date).getFullYear(),parseDate(state.date).getMonth(),1,12);state.modal='month';renderModal();break;
+      case 'month-prev':state.calendarMonth=new Date(state.calendarMonth.getFullYear(),state.calendarMonth.getMonth()-1,1,12);renderModal();break;
+      case 'month-next':state.calendarMonth=new Date(state.calendarMonth.getFullYear(),state.calendarMonth.getMonth()+1,1,12);renderModal();break;
+      case 'month-day':{const d=el.dataset.date;closeModal();updateSelectedDate(d);break;}
+      case 'month-today':closeModal();updateSelectedDate(dateKey(new Date()));break;
+      case 'settings': state.modal='settings';renderModal();break;
+      case 'close': closeModal();break;
+      case 'add': openEditor();break;
+      case 'category': state.selectedCategory=el.dataset.value;document.getElementById('categoryInput').value=state.selectedCategory;document.querySelectorAll('.category-option').forEach(btn=>{const picked=btn.dataset.value===state.selectedCategory;btn.classList.toggle('chosen',picked);btn.setAttribute('aria-pressed',String(picked));});break;
+      case 'tab':state.tab=el.dataset.value;closeModal();render();break;
+      case 'today':updateSelectedDate(dateKey(new Date()));break;
+      case 'select-date':updateSelectedDate(el.dataset.date);break;
+      case 'open-day':updateSelectedDate(el.dataset.date);break;
+      case 'week-prev':state.weekAnchor=addDays(state.weekAnchor,-7);render();break;
+      case 'week-next':state.weekAnchor=addDays(state.weekAnchor,7);render();break;
+      case 'filter':state.filter=el.dataset.value;render();break;
+      case 'details':state.editId=id;state.modal='details';renderModal();break;
+      case 'edit':if(getEvent(id)?.googleReadOnly){showToast('Edit this multi-day event in Google Calendar');break;}openEditor(id);break;
+      case 'toggle-done':{const e=getEvent(id);if(!e)return;e.done=!e.done;saveEvents();if(state.modal==='details')closeModal();render();showToast(e.done?'Another moment, beautifully done':'Moved back to your to-do list');break;}
+      case 'delete':{const e=getEvent(id);if(!e)return;if(!confirm(`Delete “${e.title}”${e.googleSync && e.googleEventId ? ' from Daymark and Google Calendar' : ''}?`))return;state.events=state.events.filter(v=>v.id!==id);saveEvents();closeModal();render();if(e.googleSync && e.googleEventId)void removeGoogleEvent(e);else showToast('Moment deleted');break;}
+      case 'move':if(!getEvent(state.editId)?.googleReadOnly)moveEvent(state.editId,+el.dataset.delta);else showToast('Edit multi-day events in Google Calendar');break;
+      case 'start-focus':startFocus(id);break;
+      case 'focus-toggle':focusToggle();break;
+      case 'focus-reset':if(state.focus){state.focus.remaining=state.focus.length;state.focus.running=false;state.focus.endAt=null;saveFocus();updateTimerUI();}break;
+      case 'export-ics':exportIcs();break;
+      case 'export-json':exportJson();break;
+      case 'import':document.getElementById('importFile')?.click();break;
+      case 'google-connect':connectGoogle();break;
+      case 'google-sync':void syncGoogle();break;
+      case 'google-disconnect':disconnectGoogle();break;
+      case 'reset-demo':if(confirm('Replace all existing plans with the sample plans?')){state.events=makeDemo();saveEvents();state.date=dateKey(new Date());state.weekAnchor=startWeek(new Date());state.tab='day';closeModal();render();showToast('Sample plans restored');}break;
+      case 'clear-all':if(confirm('Clear the events stored in Daymark on this phone? Your Google Calendar will NOT be erased; Google events return on the next sync.')){state.events=[];saveEvents();closeModal();render();showToast('Your calendar is now clear');}break;
+    }
+  }
+  app.addEventListener('click',event=>{
+    if(event.target.classList.contains('overlay')){closeModal();return;}
+    const el=event.target.closest('[data-action]');if(el){event.preventDefault();handleAction(el.dataset.action,el);}
+  });
+  app.addEventListener('submit',event=>{
+    if(event.target.id!=='eventForm')return;
+    event.preventDefault();const data=new FormData(event.target);
+    const date=String(data.get('date')),start=data.has('allDay') ? '00:00' : String(data.get('start'));
+    const previous=state.editId ? getEvent(state.editId) : null;
+    const linked = data.has('googleSync') && (googleConnected() || previous?.googleSync);
+    const e=validEvent({ id:state.editId||uid(),title:data.get('title'),date,start,duration:data.has('allDay') ? 1440 : data.get('duration'),category:data.get('category'),note:data.get('note'),location:data.get('location'),done:previous?.done || false,allDay:data.has('allDay'),googleSync:linked,googleEventId:linked ? previous?.googleEventId : '',googleDirty:linked,googleReadOnly:false });
+    if(!e){showToast('Check the title, date, time, and duration.');return;}
+    const previousId=state.editId;
+    // Switching off Google sync unlinks this local copy without deleting its remote counterpart.
+    if (previous?.googleSync && !linked) showToast('This copy is now local-only; the original stays in Google Calendar');
+    if(previousId){state.events=state.events.map(item=>item.id===previousId?e:item);}else{state.events.push(e);}
+    state.date=e.date;state.weekAnchor=startWeek(parseDate(e.date));state.tab='day';state.filter='all';saveEvents();closeModal();render();showToast(linked ? googleConnected() ? 'Saved locally · syncing with Google…' : 'Saved offline · reconnect to sync with Google' : previousId?'Moment updated':'A new moment, beautifully planned');if(linked)void syncOneGoogleEvent(e);
+  });
+  app.addEventListener('input',event=>{if(event.target.id==='searchInput'){state.searchQuery=event.target.value;document.getElementById('searchResults').innerHTML=searchResults();}});
+  app.addEventListener('change',event=>{
+    if(event.target.id==='themeSelect'){state.theme=event.target.value;savePrefs();app.className=`app-frame theme-${state.theme}`;}
+    if(event.target.id==='importFile')importJson(event.target.files?.[0]);
+    if(event.target.id==='allDayInput'){document.getElementById('timedFields').style.display=event.target.checked?'none':'';}
+    if(event.target.id==='googleClientId'){state.googleClientId=event.target.value.trim();saveGoogleConfig();googleClient=null;googleClientFor='';}
+  });
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&state.modal)closeModal();if((event.ctrlKey||event.metaKey)&&event.key==='k'){event.preventDefault();state.tab='find';closeModal();render();document.getElementById('searchInput')?.focus();}});
+  let touchX=0,touchY=0;
+  app.addEventListener('touchstart',event=>{if(state.tab!=='day'||state.modal)return;touchX=event.touches[0].clientX;touchY=event.touches[0].clientY;},{passive:true});
+  app.addEventListener('touchend',event=>{if(state.tab!=='day'||state.modal||!touchX)return;const dx=event.changedTouches[0].clientX-touchX,dy=event.changedTouches[0].clientY-touchY;touchX=0;if(Math.abs(dx)>75&&Math.abs(dx)>Math.abs(dy)*1.5)updateSelectedDate(dateKey(addDays(parseDate(state.date),dx<0?1:-1)));},{passive:true});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden && googleConnected() && Date.now()-googleLastSync>2*60*1000)void syncGoogle({silent:true});});
+  setInterval(()=>{if(!document.hidden && googleConnected() && Date.now()-googleLastSync>5*60*1000)void syncGoogle({silent:true});},5*60*1000);
+  setInterval(()=>{const clock=document.getElementById('liveClock');if(clock)clock.textContent=clockText();if(state.focus?.running)updateTimerUI();},1000);
+  if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  render();
+})();
+
+</script>
+</body>
+</html>
