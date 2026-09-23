@@ -12,8 +12,21 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-  <link rel="stylesheet" href="./styles.css">
-  <script src="./app.js" defer></script>
+<script type="module">
+const showError=message=>{const screen=document.getElementById('screen');if(screen)screen.innerHTML='<div style="padding:40px 24px;color:#354869;font:16px -apple-system,sans-serif"><h2>FLOW needs a refresh</h2><p>'+message+'</p></div>';};
+try{
+  async function unpack(file){
+    const response=await fetch('./'+file,{cache:'no-cache'});
+    if(!response.ok)throw new Error(file+' could not be loaded');
+    const base64=(await response.text()).trim();
+    const bytes=Uint8Array.from(atob(base64),char=>char.charCodeAt(0));
+    return await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+  }
+  const [css,js]=await Promise.all([unpack('styles.css.b64'),unpack('app.js.b64')]);
+  const style=document.createElement('style');style.textContent=css;document.head.appendChild(style);
+  const script=document.createElement('script');script.textContent=js;document.body.appendChild(script);
+}catch(error){console.error(error);showError('Please open this app in an up-to-date version of Safari or Chrome and reload.');}
+</script>
 </head>
 <body>
   <div class="app" id="app">

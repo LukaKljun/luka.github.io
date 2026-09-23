@@ -1,28 +1,9 @@
 # FLOW — A calendar without the calendar
 
-FLOW is an experimental, mobile-first, installable web app that makes time feel like an environment instead of a grid.
+FLOW is an experimental, mobile-first visual calendar with a daily Flow, event Orbit and non-grid Space Map. Features: local event creation, editing, deletion, search, notes, locations, category colors, free time suggestions, JSON backup/import and iCalendar export. The app is an installable offline-first PWA.
 
-- **Flow:** an organic daily timeline with floating event cards and free-time context.
-- **Orbit:** one appointment in focus, with neighboring commitments floating around it.
-- **Space:** a constellation of upcoming events, grouped by proximity in time, plus open time windows instead of a week grid.
-- **Calendar essentials:** create, edit, delete, search, event categories, notes, location, date navigation, local-first storage, JSON backup/import, and `.ics` export.
-- **Google Calendar:** optional in-browser OAuth to import, create, edit, and delete events in your primary calendar. No client secret or backend required. Requires a Google Cloud OAuth web client ID configured by the user.
-- **iPhone:** Safari → Share → Add to Home Screen. The service worker supports offline use of the app and locally stored events.
+The GitHub Pages deployment includes two gzip + base64 source bundles (app.js.b64 and styles.css.b64) which the loader in index.html decompresses in modern browsers. Readable JavaScript, CSS, HTML and other project files are in the complete FLOW source ZIP delivered with the app. This special packing is for deployment only.
 
-## Google Calendar setup
+**Google Calendar is optional and not yet connected by default.** To connect, enable the Google Calendar API at https://console.cloud.google.com/apis/library/calendar-json.googleapis.com, configure an OAuth consent screen and add yourself as a tester if necessary, create a Web Application OAuth Client ID, and authorize JavaScript origin https://lukakljun.github.io . Enter the public Client ID in FLOW Settings, then tap Connect Google. Never paste a client secret into the app. Google events are fetched for the signed-in browser session.
 
-1. Enable the **Google Calendar API** in [Google Cloud Console](https://console.cloud.google.com/apis/library/calendar-json.googleapis.com).
-2. Configure an OAuth consent screen and, if the app is in Testing mode, add yourself as a test user.
-3. Create an OAuth **Web application** client. Add the GitHub Pages *origin* `https://lukakljun.github.io` (not the `/luka.github.io/flow/` path) to **Authorized JavaScript origins**. Add `http://localhost:8080` for local testing if needed.
-4. In FLOW → Settings, paste the **Client ID** (the public identifier, *never* a client secret), save it and tap **Connect Google**.
-5. Allow requested calendar event access. Google events remain in the current browser session; local events are saved in browser storage. Reconnect after a page reload to fetch updated Google events.
-
-Calendar data is transmitted directly between the browser and Google's Calendar API after the user authorizes access. FLOW itself runs as static files on GitHub Pages; it has no server, analytics or hidden account database.
-
-## Hosting
-
-This project lives inside `LukaKljun/luka.github.io/flow/`. If the repository has GitHub Pages configured to publish the `main` branch from `/ (root)`, visit `https://lukakljun.github.io/luka.github.io/flow/`. If it uses another Pages configuration, update that configuration or use the corresponding published URL. Google OAuth's allowed origin depends on the actual hosting domain.
-
-## Local development
-
-From this directory, run `python3 -m http.server 8080` and open `http://localhost:8080` (a server is necessary to test the service worker and GIS origin configuration).
+GitHub Pages path (if published from main /(root)): https://lukakljun.github.io/luka.github.io/flow/ . On iPhone use Safari → Share → Add to Home Screen. Local event data is stored on your device/browser, not in this GitHub repository.
