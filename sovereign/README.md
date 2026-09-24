@@ -4,7 +4,7 @@ A mobile-first, local-first gentleman's personal dashboard inspired by classic i
 
 ## Open
 
-https://lukakljun.github.io/sovereign/
+https://lukakljun.github.io/luka.github.io/sovereign/
 
 ## Features
 
